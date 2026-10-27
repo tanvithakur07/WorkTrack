@@ -1,0 +1,79 @@
+/* Sign-in page: form on the left, a month of "days off" assembling itself on the right. */
+
+body.login-page { background: var(--bg); }
+
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  min-height: 100vh;
+}
+
+.login__form-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+  padding: clamp(1.5rem, 5vw, 4.5rem);
+}
+
+.login__brand { display: flex; align-items: center; gap: 0.7rem; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.03em; }
+.login__brand .brand__mark { width: 2.4rem; height: 2.4rem; }
+
+.login__intro h1 { font-size: clamp(2.1rem, 4.6vw, 3.1rem); max-width: 14ch; }
+.login__intro p { margin-top: 0.8rem; color: var(--ink-soft); max-width: 36ch; font-size: 1.05rem; }
+
+.login__card { display: grid; gap: 1.1rem; max-width: 26rem; }
+.login__card .btn:not(.btn--icon) { width: 100%; min-height: 3rem; }
+.login__note { color: var(--ink-soft); font-size: 0.88rem; max-width: 26rem; }
+.theme-corner { position: absolute; top: 1rem; right: 1rem; z-index: 5; }
+
+/* ---- The calendar tapestry ---- */
+.login__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: var(--side-bg);
+  color: var(--side-ink-strong);
+  overflow: hidden;
+}
+.login__art::before {
+  content: "";
+  position: absolute;
+  inset: auto -20% -30% auto;
+  width: 70%; aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 197, 61, 0.22), transparent 65%);
+}
+
+.tapestry { position: relative; width: min(30rem, 100%); }
+.tapestry__month { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.03em; margin-bottom: 1.1rem; }
+.tapestry__month span { color: var(--accent); }
+.tapestry__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.45rem; }
+.tapestry__dow { text-align: center; font-size: 0.78rem; color: var(--side-ink); padding-bottom: 0.2rem; }
+.tapestry__cell {
+  aspect-ratio: 1;
+  border-radius: 24%;
+  background: rgba(255, 255, 255, 0.07);
+  opacity: 0;
+  transform: scale(0.6);
+  animation: cell-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+  animation-delay: calc(var(--i, 0) * 22ms);
+}
+.tapestry__cell--off { background: var(--accent); }
+.tapestry__cell--teal { background: #1fa89f; }
+.tapestry__cell--violet { background: #8a7bff; }
+.tapestry__cell--coral { background: #ff8d72; }
+.tapestry__cell--weekend { background: rgba(255, 255, 255, 0.03); }
+@keyframes cell-in { to { opacity: 1; transform: none; } }
+
+.tapestry__caption { margin-top: 1.4rem; color: var(--side-ink); max-width: 30ch; }
+
+@media (max-width: 900px) {
+  .login { grid-template-columns: minmax(0, 1fr); }
+  .login__art { order: -1; min-height: 15rem; padding: 1.5rem; }
+  .tapestry__month, .tapestry__caption { display: none; }
+  .tapestry { width: min(20rem, 100%); }
+  .tapestry__grid { gap: 0.3rem; }
+  .tapestry__dow { display: none; }
+}

@@ -1,0 +1,35 @@
+# Build output
+target/
+**/target/
+out/
+*.class
+*.jar
+*.war
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+application-local.properties
+**/application-local.properties
+application-local.yml
+**/application-local.yml
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# OS and log files
+.DS_Store
+Thumbs.db
+*.log
+logs/
+
+# Local backups
+*.sql.bak
+*.dump

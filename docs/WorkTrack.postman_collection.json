@@ -1,0 +1,524 @@
+{
+  "info": {
+    "name": "WorkTrack",
+    "description": "Import this collection, set the collection variables adminEmail / adminPassword (and employeeEmail / employeePassword for the employee requests), then run 'Auth > Login as administrator' first. Postman keeps the session cookie and the collection pre-request script adds the X-XSRF-TOKEN header (CSRF protection) to every POST, PUT, PATCH and DELETE.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// CSRF: copy the XSRF-TOKEN cookie into the X-XSRF-TOKEN header for state-changing requests.",
+          "const method = pm.request.method.toUpperCase();",
+          "if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {",
+          "  const baseUrl = pm.collectionVariables.get('baseUrl');",
+          "  const apply = () => {",
+          "    const token = pm.cookies.get('XSRF-TOKEN');",
+          "    if (token) { pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: token }); }",
+          "  };",
+          "  if (!pm.cookies.get('XSRF-TOKEN')) {",
+          "    pm.sendRequest({ url: baseUrl + '/api/auth/csrf', method: 'GET' }, () => apply());",
+          "  } else {",
+          "    apply();",
+          "  }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "adminEmail",
+      "value": "you@example.com"
+    },
+    {
+      "key": "adminPassword",
+      "value": "your-admin-password"
+    },
+    {
+      "key": "employeeEmail",
+      "value": "priya@example.com"
+    },
+    {
+      "key": "employeePassword",
+      "value": "Employee-pass-1"
+    },
+    {
+      "key": "employeeId",
+      "value": "2"
+    },
+    {
+      "key": "leaveId",
+      "value": "1"
+    },
+    {
+      "key": "workDate",
+      "value": "2026-03-04"
+    },
+    {
+      "key": "workLogId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "CSRF cookie",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/csrf"
+          }
+        },
+        {
+          "name": "Login as administrator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login as employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{employeeEmail}}\",\n  \"password\": \"{{employeePassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login with a wrong password (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"definitely-wrong\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Who am I",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"old-password-1\",\n  \"newPassword\": \"new-password-2\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/change-password"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees (administrator)",
+      "item": [
+        {
+          "name": "List employees (search, filter, page, sort)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/employees?q=&department=Engineering&status=ACTIVE&page=0&size=10&sortBy=fullName&direction=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employees"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": ""
+                },
+                {
+                  "key": "department",
+                  "value": "Engineering"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "fullName"
+                },
+                {
+                  "key": "direction",
+                  "value": "asc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Departments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/employees/departments"
+          }
+        },
+        {
+          "name": "Get one employee",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/employees/{{employeeId}}"
+          }
+        },
+        {
+          "name": "Create employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Carla Newhire\",\n  \"email\": \"carla@example.com\",\n  \"password\": \"Welcome-123\",\n  \"department\": \"Finance\",\n  \"jobTitle\": \"Analyst\",\n  \"joiningDate\": \"2026-02-02\",\n  \"role\": \"EMPLOYEE\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": "{{baseUrl}}/api/employees"
+          }
+        },
+        {
+          "name": "Update employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Carla Newhire\",\n  \"email\": \"carla@example.com\",\n  \"department\": \"Finance\",\n  \"jobTitle\": \"Senior Analyst\",\n  \"joiningDate\": \"2026-02-02\",\n  \"role\": \"EMPLOYEE\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": "{{baseUrl}}/api/employees/{{employeeId}}"
+          }
+        },
+        {
+          "name": "Deactivate employee",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/employees/{{employeeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leave requests",
+      "item": [
+        {
+          "name": "Send a request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leaveType\": \"EARNED\",\n  \"startDate\": \"2026-12-07\",\n  \"endDate\": \"2026-12-11\",\n  \"reason\": \"Family wedding\"\n}"
+            },
+            "url": "{{baseUrl}}/api/leaves"
+          }
+        },
+        {
+          "name": "Send an invalid request (end before start, expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leaveType\": \"CASUAL\",\n  \"startDate\": \"2026-12-11\",\n  \"endDate\": \"2026-12-07\",\n  \"reason\": \"Wrong way round\"\n}"
+            },
+            "url": "{{baseUrl}}/api/leaves"
+          }
+        },
+        {
+          "name": "My requests",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/my?status=PENDING&page=0&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leaves",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "All requests (administrator)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves?status=PENDING&from=2026-12-01&to=2026-12-31&page=0&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leaves"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "from",
+                  "value": "2026-12-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-12-31"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get one request",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/leaves/{{leaveId}}"
+          }
+        },
+        {
+          "name": "Cancel my pending request",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/leaves/{{leaveId}}/cancel"
+          }
+        },
+        {
+          "name": "Approve (administrator)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/leaves/{{leaveId}}/approve"
+          }
+        },
+        {
+          "name": "Reject (administrator)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Release week, please pick other dates.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/leaves/{{leaveId}}/reject"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboards",
+      "item": [
+        {
+          "name": "Admin dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/dashboard/admin"
+          }
+        },
+        {
+          "name": "Employee dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/dashboard/employee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Daily work reports",
+      "item": [
+        {
+          "name": "Log work (employee)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/work-logs",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workDate\": \"{{workDate}}\",\n  \"taskTitle\": \"Fix login bug\",\n  \"description\": \"Found the cause in the session filter.\",\n  \"hoursSpent\": 3.5,\n  \"status\": \"COMPLETED\"\n}"
+            }
+          }
+        },
+        {
+          "name": "My entries",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/work-logs/my?from={{workDate}}&to={{workDate}}"
+          }
+        },
+        {
+          "name": "My summary",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/work-logs/my/summary"
+          }
+        },
+        {
+          "name": "One entry",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/work-logs/{{workLogId}}"
+          }
+        },
+        {
+          "name": "Edit entry (owner)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/work-logs/{{workLogId}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workDate\": \"{{workDate}}\",\n  \"taskTitle\": \"Fix login bug\",\n  \"description\": \"Edited description.\",\n  \"hoursSpent\": 3.5,\n  \"status\": \"COMPLETED\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete draft (owner)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/work-logs/{{workLogId}}"
+          }
+        },
+        {
+          "name": "Team reports (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/work-logs?page=0&size=10"
+          }
+        },
+        {
+          "name": "Team summary (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/work-logs/summary"
+          }
+        },
+        {
+          "name": "Missing reports (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/work-logs/missing"
+          }
+        }
+      ]
+    }
+  ]
+}

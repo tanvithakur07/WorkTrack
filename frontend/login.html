@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Sign in · WorkTrack</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="/js/theme.js"></script>
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body class="login-page">
+  <button type="button" class="btn btn--ghost btn--icon theme-corner" id="theme-toggle"></button>
+  <main class="login">
+    <div class="login__form-side">
+      <div class="login__brand">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="9" fill="#ffc53d"/>
+          <path d="M11 8v3.5M21 8v3.5" stroke="#0d4f4c" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M8.5 14.5h15" stroke="#0d4f4c" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M11.5 20.5l3 3 6-6.5" stroke="#0d4f4c" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>WorkTrack</span>
+      </div>
+
+      <div class="login__intro">
+        <h1>Time off, without the back-and-forth.</h1>
+        <p>Ask for leave, get a decision, and see who is away. All in one place.</p>
+      </div>
+
+      <form class="login__card" id="login-form" novalidate>
+        <div id="login-banner" role="alert"></div>
+        <div class="field" data-field="email">
+          <label for="email">Work email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="username" inputmode="email" required>
+          <p class="field__error"></p>
+        </div>
+        <div class="field" data-field="password">
+          <label for="password">Password</label>
+          <div class="input-group">
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+            <button type="button" class="btn btn--ghost btn--icon btn--sm input-group__btn" id="toggle-password"></button>
+          </div>
+          <p class="field__error"></p>
+        </div>
+        <button type="submit" class="btn btn--accent" id="login-submit">Sign in</button>
+      </form>
+
+      <p class="login__note">No account yet? Ask your administrator to create one for you.</p>
+    </div>
+
+    <div class="login__art" aria-hidden="true">
+      <div class="tapestry">
+        <p class="tapestry__month" id="tapestry-month"></p>
+        <div class="tapestry__grid" id="tapestry-grid"></div>
+        <p class="tapestry__caption">Every day off, planned and visible before it happens.</p>
+      </div>
+    </div>
+  </main>
+  <noscript><p class="banner banner--error">WorkTrack needs JavaScript to run. Please turn it on and reload.</p></noscript>
+  <script type="module" src="/js/pages/login.js"></script>
+</body>
+</html>
